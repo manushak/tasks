@@ -110,27 +110,29 @@ const demand1 = (times) => {
 
 demand1(count);
 
-const demand2 = (times, callback) => {
-    const nums = [];
-    for (let i = 0; i < times; i++) {
-        giveRandAsync((num) => {
-            nums.push(num);
-            if (nums.length == times) {
-                callback(nums);
-            }
-        })
-    }
-}
-
-demand2(count, (result) => {
-    const average = result.reduce((accumulator, current) => { return accumulator + current }) / count;
-    console.log(average)
-})
-
 const getAverage5 = (arr) => {
-    const average = arr.reduce((acc, current) => { return acc + current }) / count;
+    const average = arr.reduce((acc, current) => { return acc + current }) / arr.length;
     console.log(average);
 };
+
+const demand2 = (callback) => {
+    const addNumber = (nums) => {
+        giveRandAsync(num => {
+            nums.push(num);
+
+            if (nums.length == count) {
+                return callback(nums);
+            }
+
+            callback(nums);
+            return addNumber(nums);
+        })
+    }
+
+    return addNumber([])
+}
+
+demand2(getAverage5)
 
 const demand3 = (callback) => {
     const arr = [];
@@ -141,8 +143,9 @@ const demand3 = (callback) => {
 
             if (arr.length == count) {
                 clearInterval(interval);
-                callback(arr);
             }
+
+            return callback(arr);
         })
     }, 20000);
 }
@@ -150,20 +153,19 @@ const demand3 = (callback) => {
 demand3(getAverage5);
 
 
-const arr4 = [];
-const demand4 = (times, callback) => {
-    giveRandAsync((result) => {
-        arr4.push(result);
+const demand4 = (callback) => {
+    const addNumber = (nums) => {
+        giveRandAsync(num => {
+            nums.push(num);
 
-        if (arr4.length == count) {
-            callback(arr4);
-        }
+            if (nums.length == count) {
+                return callback(nums);
+            }
+            return addNumber(nums);
+        })
+    }
 
-        if (times == 0) {
-            return;
-        }
-        demand4(times - 1, callback)
-    })
+    return addNumber([])
 }
 
-demand4(10, getAverage5);
+demand4(getAverage5);
