@@ -1,0 +1,22 @@
+{
+  "name": "tasks",
+  "version": "1.0.0",
+  "description": "",
+  "main": "tasks.js",
+  "scripts": {
+    "test": "standard && node tasks.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/manushak/tasks.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/manushak/tasks/issues"
+  },
+  "homepage": "https://github.com/manushak/tasks#readme",
+  "devDependencies": {
+    "standard": "^10.0.3"
+  }
+}
