@@ -49,6 +49,7 @@ const all = (promises = []) => {
     promises.forEach(promise => {
       promise.then(item => {
         result.push(item)
+
         if (result.length === promises.length) {
           resolve(result)
         }
@@ -59,28 +60,20 @@ const all = (promises = []) => {
   })
 }
 
-const each = (promises = [], iterator) => {
+const each = (inputs = [], iterator) => {
   const result = []
 
-  return new Promise((resolve, reject) => {
-    const rec = (item, index, length) => {
-      if (index !== length) {
-        return Promise.resolve(item).then(_item => {
-          result.push(_item)
-          iterator(_item, index, length)
+  return inputs.reduce((prev, cur, index) => {
+    return prev.then(() => {
+      return Promise.resolve(iterator(cur, index, inputs.length)).then(() => {
+        result.push(cur)
 
-          // Invoke next promise
-          return rec(promises[index + 1], index + 1, length)
-        }).catch(err => {
-          reject(err)
-        })
-      } else {
-        resolve(result)
-      }
-    }
-
-    rec(promises[0], 0, promises.length)
-  })
+        if (index === inputs.length - 1) {
+          return Promise.resolve(result)
+        }
+      })
+    })
+  }, Promise.resolve())
 }
 
 Promise.prototype.tap = function (handler) {
@@ -114,8 +107,9 @@ const methods = {
     })
   },
   each: () => {
-    each([p1, p2, p3, p4, p5], (item, index, length) => {
+    each(numbers, (item, index, length) => {
       console.log('Promise each item --', item)
+      return Promise.resolve(item)
     }).then(result => {
       console.log('Promise each result --', result)
     }).catch(err => {
