@@ -63,17 +63,24 @@ const all = (promises = []) => {
 const each = (inputs = [], iterator) => {
   const result = []
 
-  return inputs.reduce((prev, cur, index) => {
-    return prev.then(() => {
-      return Promise.resolve(iterator(cur, index, inputs.length)).then(() => {
-        result.push(cur)
+  return new Promise((resolve, reject) => {
+    const rec = (item, index, length) => {
+      if (index !== length) {
+        return Promise.resolve(item).then(_item => {
+          return iterator(_item, index, length).then((i) => {
+            result.push(i)
+            return rec(inputs[index + 1], index + 1, length)
+          })
+        }).catch(err => {
+          reject(err)
+        })
+      } else {
+        resolve(result)
+      }
+    }
 
-        if (index === inputs.length - 1) {
-          return Promise.resolve(result)
-        }
-      })
-    })
-  }, Promise.resolve())
+    rec(inputs[0], 0, inputs.length)
+  })
 }
 
 Promise.prototype.tap = function (handler) {
@@ -109,7 +116,7 @@ const methods = {
   each: () => {
     each(numbers, (item, index, length) => {
       console.log('Promise each item --', item)
-      return Promise.resolve(item)
+      return Promise.resolve(item * 2)
     }).then(result => {
       console.log('Promise each result --', result)
     }).catch(err => {
